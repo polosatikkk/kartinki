@@ -21,7 +21,7 @@
 
 # Стек:
 - бэкенд - django, django rest
-- фронтенд -
+- фронтенд - html, css, js, react
 - бд - postgres (?)
 - мобилка (?) -
 
