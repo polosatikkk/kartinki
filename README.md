@@ -23,7 +23,7 @@
 - бэкенд - django, django rest
 - фронтенд - html, css, js, react
 - бд - postgres (?)
-- мобилка (?) -
+- мобилка - kotlin
 
 # База данных:
 er диаграмма
