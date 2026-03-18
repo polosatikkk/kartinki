@@ -1,6 +1,15 @@
 # Платформа для художников и иллюстраторов
 
-# Название:
+# 
+```python
+python -m venv venv
+```
+```python
+pip install -r requirements.txt
+```
+```python
+python manage.py runserver
+```
 
 # Основной планируемый функционал: 
 
