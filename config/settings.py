@@ -122,4 +122,4 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-CORS_ALLOW_ALL_ORIGINS = True  # ДЛЯ РАЗРАБОТКИ - РАЗРЕШАЕТ ВСЁ
+CORS_ALLOW_ALL_ORIGINS = True  # потом решу
