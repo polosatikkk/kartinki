@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello from Django</title>
+</head>
+<body>
+
+    <div id="message" style="border: 1px solid red; padding: 10px;">Здесь будет сообщение</div>
+
+    <script>
+        console.log('Скрипт запущен');
+
+        fetch('http://127.0.0.1:8000/api/hello/')
+            .then(response => {
+                console.log('Ответ получен, статус:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Данные:', data);
+                // Находим элемент
+                const messageElement = document.getElementById('message');
+                console.log('Элемент найден:', messageElement);
+
+                // Вставляем текст
+                if (messageElement) {
+                    messageElement.innerText = data[0].hello_world;
+                    console.log('Текст вставлен');
+                } else {
+                    console.log('Элемент не найден!');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('message').innerText = 'Ошибка: ' + error;
+            });
+    </script>
+</body>
+</html>
