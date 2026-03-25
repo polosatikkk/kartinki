@@ -1,35 +1,24 @@
-from pydantic import BaseModel, Field
-from datetime import datetime
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-
 class UserReg(BaseModel):
-    username: str = Field(min_length=5, max_length=40, description="")
+    username: str = Field(min_length=3, max_length=40)
     nickname: Optional[str] = Field(None, max_length=40)
-    password: str = Field(min_length=6)
-    password2: str = Field(min_length=6)
+    password: str = Field(min_length=4)
+    password2: str = Field(min_length=4)
 
     @field_validator('username')
     def username_correct(cls, value):
-        if not value.isalnum():
-            raise ValueError('Имя пользователя должно содержать только буквы и цифры')
+        if not value.replace('_', '').isalnum():
+            raise ValueError('Только буквы, цифры и _')
         return value
 
     @field_validator('password2')
-    def passwords_match(cls, value, info):
-        if 'password' in info.data and value != info.data['password']:
+    def passwords_match(cls, v, info):
+        if 'password' in info.data and v != info.data['password']:
             raise ValueError('Пароли не совпадают')
-        return value
-
-
-#class UserRegOut(BaseModel):
- #   username: str
-  #  nickname: Optional[str] = None
-   # class Config:
-    #    from_attributes = True
-        # для профиля потом хз
+        return v
 
 class UserLog(BaseModel):
     username: str
     password: str
-

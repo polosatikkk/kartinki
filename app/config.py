@@ -1,3 +1,6 @@
-# настройки
+import os
+from dotenv import load_dotenv
 
-DATABASE_URL = "sqlite:///./sql_app.db"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./nit.db")
