@@ -40,3 +40,30 @@ class UserOut(BaseModel):
     username: str
     nickname: str | None
     created_at: datetime
+class UserProfileOut(UserOut):
+    posts_count: int
+    is_following: bool = False
+class UserUpdate(BaseModel):
+    nickname: str | None = Field(None, max_length=40)
+
+
+class PostBase(BaseModel):
+    description: str | None = None
+
+
+class PostCreate(PostBase):
+    pass
+
+
+class PostOut(PostBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    image_path: str
+    created_at: datetime
+    user_id: int
+
+
+    @property
+    def image_url(self) -> str:
+        return f"/uploads/{self.image_path}"
