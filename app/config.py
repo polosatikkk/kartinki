@@ -1,0 +1,3 @@
+# настройки
+
+DATABASE_URL = "sqlite:///./sql_app.db"
