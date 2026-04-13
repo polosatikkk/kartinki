@@ -59,11 +59,12 @@ class PostOut(PostBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    image_path: str
+    image_path: Optional[str] = None  # Может быть None если пост без картинки
     created_at: datetime
     user_id: int
 
-
     @property
-    def image_url(self) -> str:
-        return f"/uploads/{self.image_path}"
+    def image_url(self) -> Optional[str]:
+        if self.image_path:
+            return f"/uploads/{self.image_path}"
+        return None
