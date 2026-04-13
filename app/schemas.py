@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional
+from datetime import datetime
 
 class UserReg(BaseModel):
     username: str = Field(min_length=3, max_length=40)
@@ -22,3 +23,20 @@ class UserReg(BaseModel):
 class UserLog(BaseModel):
     username: str
     password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    username: str
+    nickname: str | None
+    created_at: datetime
