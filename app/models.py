@@ -13,14 +13,14 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # posts = relationship("Post", back_populates="author")
+    posts = relationship("Post", back_populates="author")
 
 
 class Post(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, nullable=True)
-    image_path = Column(String, nullable=False)  
+    image_path = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
