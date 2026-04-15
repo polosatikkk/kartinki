@@ -59,7 +59,7 @@ class PostOut(PostBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    image_path: Optional[str] = None  # Может быть None если пост без картинки
+    image_path: Optional[str] = None
     created_at: datetime
     user_id: int
 
