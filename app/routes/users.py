@@ -22,7 +22,6 @@ def follow_user(
         current_user: Annotated[models.User, Depends(get_current_user)],
         db: Session = Depends(get_db)
 ):
-    """Подписаться на пользователя"""
     if current_user.username == username:
         raise HTTPException(400, "Нельзя подписаться на самого себя")
 
