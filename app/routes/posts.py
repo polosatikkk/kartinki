@@ -72,16 +72,24 @@ def get_following_feed(
 ):
     return db.query(models.Post).order_by(models.Post.created_at.desc()).offset(skip).limit(limit).all()
 
+
 @router.get("/user/{username}", response_model=List[schemas.PostOut])
 def get_user_posts(
         username: str,
         skip: int = 0,
         limit: int = 20,
+        current_user: models.User | None = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
     if not user:
         raise HTTPException(404, "Пользователь не найден")
+
+    is_owner = current_user and current_user.id == user.id
+    is_following = current_user and (user in current_user.following)
+
+    if user.is_private and not is_owner and not is_following:
+        return []
 
     posts = db.query(models.Post).filter(
         models.Post.user_id == user.id

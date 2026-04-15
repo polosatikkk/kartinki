@@ -39,13 +39,38 @@ class UserOut(BaseModel):
     id: int
     username: str
     nickname: str | None
+    bio: str | None = None
+    avatar_path: str | None = None
+    is_private: bool = False
     created_at: datetime
+
+    @property
+    def avatar_url(self) -> Optional[str]:
+        if self.avatar_path:
+            return f"/uploads/avatars/{self.avatar_path}"
+        return None
 class UserProfileOut(UserOut):
     posts_count: int
+    followers_count: int = 0
+    following_count: int = 0
     is_following: bool = False
+    is_owner: bool = False
 class UserUpdate(BaseModel):
     nickname: str | None = Field(None, max_length=40)
+    bio: str | None = Field(None, max_length=40)
+    is_private: bool | None = None
 
+
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str = Field(min_length=4)
+    new_password2: str
+
+    @field_validator('new_password2')
+    def passwords_match(cls, v, info):
+        if 'new_password' in info.data and v != info.data['new_password']:
+            raise ValueError('Новые пароли не совпадают')
+        return v
 
 class PostBase(BaseModel):
     description: str | None = None
@@ -67,4 +92,19 @@ class PostOut(PostBase):
     def image_url(self) -> Optional[str]:
         if self.image_path:
             return f"/uploads/{self.image_path}"
+        return None
+
+
+class UserListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    username: str
+    nickname: str | None
+    avatar_path: str | None
+    is_following: bool = False
+
+    @property
+    def avatar_url(self) -> Optional[str]:
+        if self.avatar_path:
+            return f"/uploads/avatars/{self.avatar_path}"
         return None
