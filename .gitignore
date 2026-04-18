@@ -6,6 +6,9 @@ venv/
 nit.db
 *.db
 
+
+.env
+
 app/uploads/**/*.*
 app/uploads/avatars/**/*.*
 app/uploads/headers/**/*.*
