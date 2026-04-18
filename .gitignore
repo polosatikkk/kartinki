@@ -1,6 +1,21 @@
-
+.env
+__pycache__/
+*.pyc
+.venv/
 venv/
-env/
-ENV/
+nit.db
+*.db
 
+app/uploads/**/*.*
+app/uploads/avatars/**/*.*
+app/uploads/headers/**/*.*
+
+!app/uploads/.gitkeep
+!app/uploads/avatars/.gitkeep
+!app/uploads/headers/.gitkeep
+!app/uploads/**/.gitkeep
+
+*.log
+.DS_Store
 .idea/
+.vscode/
