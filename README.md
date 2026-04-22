@@ -1,4 +1,4 @@
-# ![логотип]((https://github.com/polosatikkk/kartinki-backend/blob/release/2/logo.png)) API для платформы художников и иллюстраторов - "Нить"
+# ![логотип](https://github.com/polosatikkk/kartinki-backend/blob/release/2/logo.png) API для платформы художников и иллюстраторов - "Нить"
 
 
 ## Функционал
