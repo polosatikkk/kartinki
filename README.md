@@ -41,13 +41,13 @@
 ```
 
 ## Стек
-Веб - FastAPI
-ORM - SQLAlchemy
-База данных - SQLite
-Аутентификация - JWT (python-jose)
-Пароли - Bcrypt (passlib)
-Валидация данных - Pydantic
-Админ-интерфейс - SQLAdmin
+- Веб - FastAPI
+- ORM - SQLAlchemy
+- База данных - SQLite
+- Аутентификация - JWT (python-jose)
+- Пароли - Bcrypt (passlib)
+- Валидация данных - Pydantic
+- Админ-интерфейс - SQLAdmin
 
 ## Установка
 
