@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database import get_db
 from app import models, schemas
-from app.routes.auth import get_current_user
+from app.routes.auth import get_current_user, get_current_user_optional
 from app.routes.tags import parse_tags_from_text
 
 router = APIRouter(prefix="/api/posts", tags=["posts"])
@@ -16,23 +16,17 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 def _enrich_post(post: models.Post, current_user_id: Optional[int], db: Session):
-
     likes_count = db.query(func.count(models.Like.user_id)).filter(
         models.Like.post_id == post.id
     ).scalar() or 0
-
     comments_count = db.query(func.count(models.Comment.id)).filter(
         models.Comment.post_id == post.id
     ).scalar() or 0
-
     bookmarks_count = db.query(func.count(models.Bookmark.user_id)).filter(
         models.Bookmark.post_id == post.id
     ).scalar() or 0
     is_liked = False
     is_bookmarked = False
-
-
-
     if current_user_id:
         is_liked = db.query(models.Like).filter(
             models.Like.user_id == current_user_id,
@@ -43,17 +37,16 @@ def _enrich_post(post: models.Post, current_user_id: Optional[int], db: Session)
             models.Bookmark.user_id == current_user_id,
             models.Bookmark.post_id == post.id
         ).first() is not None
-        tags = []
-        for tag in post.tags:
-            posts_count = db.query(func.count(models.post_tags.c.post_id)).filter(
-                models.post_tags.c.tag_id == tag.id
-            ).scalar() or 0
-            tags.append({
-                "id": tag.id,
-                "name": tag.name,
-                "posts_count": posts_count
-            })
-
+    tags = []
+    for tag in post.tags:
+        posts_count = db.query(func.count(models.post_tags.c.post_id)).filter(
+            models.post_tags.c.tag_id == tag.id
+        ).scalar() or 0
+        tags.append({
+            "id": tag.id,
+            "name": tag.name,
+            "posts_count": posts_count
+        })
     return {
         "id": post.id,
         "description": post.description,
@@ -71,7 +64,6 @@ def _enrich_post(post: models.Post, current_user_id: Optional[int], db: Session)
         "is_owner": current_user_id == post.user_id,
         "tags": tags
     }
-
 
 @router.post("/", response_model=schemas.PostOut)
 async def create_post(
@@ -119,7 +111,7 @@ async def create_post(
 def get_latest_posts(
         skip: int = 0,
         limit: int = 20,
-        current_user: Optional[models.User] = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     if current_user:
@@ -142,7 +134,7 @@ def get_latest_posts(
 def get_popular_posts(
         skip: int = 0,
         limit: int = 20,
-        current_user: Optional[models.User] = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     if current_user:
@@ -182,7 +174,7 @@ def get_user_posts(
         username: str,
         skip: int = 0,
         limit: int = 20,
-        current_user: models.User | None = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -224,7 +216,7 @@ def get_single_post(
 @router.delete("/{post_id}")
 def delete_post(
         post_id: int,
-        current_user: models.User = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     post = db.query(models.Post).filter(
