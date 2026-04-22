@@ -52,6 +52,21 @@ def unfollow_user(
     return {"message": f"Вы отписались от {username}"}
 
 
+@router.delete("/followers/{username}")
+def remove_follower(
+        username: str,
+        current_user: Annotated[models.User, Depends(get_current_user)],
+        db: Session = Depends(get_db)
+):
+    follower = db.query(models.User).filter(models.User.username == username).first()
+    if not follower:
+        raise HTTPException(404, "Пользователь не найден")
+    if follower not in current_user.followers:
+        raise HTTPException(400)
+    current_user.followers.remove(follower)
+    db.commit()
+    return {"message": f"Подписчик удален"}
+
 @router.get("/{username}/followers", response_model=List[schemas.UserListItem])
 def get_followers(
         username: str,

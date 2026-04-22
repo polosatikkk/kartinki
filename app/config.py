@@ -9,8 +9,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "kakoitoadmin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "kakoitoparol")
 ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET_KEY")
 
 SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
