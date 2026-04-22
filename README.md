@@ -15,28 +15,28 @@
 ## Структура проекта
 
 
-├── app/
-│   ├── routes/          # эндпоинты
-│   │   ├── auth.py      # аутентификация
-│   │   ├── users.py     # работа с пользователями
-│   │   ├── posts.py     # посты
-│   │   ├── comments.py  # комментарии
-│   │   └── tags.py      # теги
-│   ├── admin.py         # админка
-│   ├── config.py        # конфигурация .env
-│   ├── database.py      # подключение к бд
-│   ├── models.py        # модели
-│   ├── schemas.py       # схемы
-│   └── main.py          # точка входа
-├── uploads/             # изображения
-│   ├── avatars/         
-│   ├── headers/         
-│   └── *.jpg            
-├── .env.example         # пример переменных окружения
-├── .gitignore
-├── requirements.txt
-├── nit.db               
-└── README.md
+-├── app/
+-│   ├── routes/          # эндпоинты
+-│   │   ├── auth.py      # аутентификация
+-│   │   ├── users.py     # работа с пользователями
+-│   │   ├── posts.py     # посты
+-│   │   ├── comments.py  # комментарии
+-│   │   └── tags.py      # теги
+-│   ├── admin.py         # админка
+-│   ├── config.py        # конфигурация .env
+-│   ├── database.py      # подключение к бд
+-│   ├── models.py        # модели
+-│   ├── schemas.py       # схемы
+-│   └── main.py          # точка входа
+-├── uploads/             # изображения
+-│   ├── avatars/         
+-│   ├── headers/         
+-│   └── *.jpg            
+-├── .env.example         # пример переменных окружения
+-├── .gitignore
+-├── requirements.txt
+-├── nit.db               
+-└── README.md
 
 ## Стек
 Веб - FastAPI
