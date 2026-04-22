@@ -216,7 +216,7 @@ def get_single_post(
 @router.delete("/{post_id}")
 def delete_post(
         post_id: int,
-        current_user: models.User | None = Depends(get_current_user),
+        current_user: models.User = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
     post = db.query(models.Post).filter(
@@ -229,10 +229,8 @@ def delete_post(
         file_path = os.path.join(UPLOAD_DIR, post.image_path)
         if os.path.exists(file_path):
             os.remove(file_path)
-
     db.delete(post)
     db.commit()
-
     return {"message": "Пост удален"}
 
 
