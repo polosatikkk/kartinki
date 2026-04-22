@@ -61,9 +61,11 @@ cd nit-backend
 python -m venv venv
 ```
 Активация окружения
-# Windows
+
+Windows
 .venv\Scripts\activate
-# macOS/Linux
+
+macOS/Linux
 source .venv/bin/activate
 
 Зависимости
