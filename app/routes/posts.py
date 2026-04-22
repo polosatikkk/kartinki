@@ -182,7 +182,7 @@ def get_user_posts(
         raise HTTPException(404, "Пользователь не найден")
 
     is_owner = current_user and current_user.id == user.id
-    is_following = current_user and (user in current_user.following) # !,
+    is_following = current_user and (user in current_user.following)
     if user.is_private and not is_owner and not is_following:
         return []
     posts = db.query(models.Post).filter(
@@ -201,7 +201,6 @@ def get_single_post(
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
         raise HTTPException(404, "Пост не найден")
-
     author = post.author
     if author.is_private:
         is_owner = current_user and current_user.id == author.id
