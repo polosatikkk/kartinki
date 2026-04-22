@@ -1,4 +1,4 @@
-# <img src="https://github.com/polosatikkk/kartinki-backend/blob/release/2/logo.png" width="100" height="100"> API для платформы художников и иллюстраторов - "Нить"
+# <img src="https://github.com/polosatikkk/kartinki-backend/blob/release/2/logo.png" width="90" height="90"> API для платформы художников и иллюстраторов - "Нить"
 
 
 ## Функционал
