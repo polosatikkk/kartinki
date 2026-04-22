@@ -63,10 +63,14 @@ python -m venv venv
 Активация окружения
 
 Windows
+```
 .venv\Scripts\activate
+```
 
 macOS/Linux
+```
 source .venv/bin/activate
+```
 
 Зависимости
 ```python
