@@ -1,4 +1,4 @@
-# API для платформы художников и иллюстраторов - "Нить"
+# <img src="https://github.com/polosatikkk/kartinki-backend/blob/release/2/logo.png" width="80" height="80"> API платформы для художников и иллюстраторов - "Нить"
 
 
 ## Функционал
@@ -41,13 +41,13 @@
 ```
 
 ## Стек
-Веб - FastAPI
-ORM - SQLAlchemy
-База данных - SQLite
-Аутентификация - JWT (python-jose)
-Пароли - Bcrypt (passlib)
-Валидация данных - Pydantic
-Админ-интерфейс - SQLAdmin
+- Веб - FastAPI
+- ORM - SQLAlchemy
+- База данных - SQLite
+- Аутентификация - JWT (python-jose)
+- Пароли - Bcrypt (passlib)
+- Валидация данных - Pydantic
+- Админ-интерфейс - SQLAdmin
 
 ## Установка
 
