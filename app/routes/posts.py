@@ -195,7 +195,7 @@ def get_user_posts(
 @router.get("/{post_id}", response_model=schemas.PostOut)
 def get_single_post(
         post_id: int,
-        current_user: models.User | None = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
@@ -216,7 +216,7 @@ def get_single_post(
 @router.delete("/{post_id}")
 def delete_post(
         post_id: int,
-        current_user: Optional[models.User] = Depends(get_current_user_optional),
+        current_user: models.User | None = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
     post = db.query(models.Post).filter(
