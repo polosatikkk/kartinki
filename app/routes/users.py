@@ -289,40 +289,43 @@ def get_user_profile(
     user = db.query(models.User).filter(models.User.username == username).first()
     if not user:
         raise HTTPException(404, "Пользователь не найден")
+
     is_owner = current_user and current_user.id == user.id
     is_following = current_user and (user in current_user.following)
-    if user.is_private and not is_owner and not is_following:
-        return {
-            "id": user.id,
-            "username": user.username,
-            "nickname": user.nickname,
-            "bio": None,
-            "avatar_path": user.avatar_path,
-            "is_private": True,
-            "created_at": user.created_at,
-            "posts_count": 0,
-            "followers_count": 0,
-            "following_count": 0,
-            "is_following": False,
-            "is_owner": False
-        }
 
+    if user.is_private and not is_owner and not is_following:
+        return schemas.UserProfileOut(
+            id=user.id,
+            username=user.username,
+            nickname=user.nickname,
+            bio=None,
+            avatar_path=user.avatar_path,
+            header_path=user.header_path,
+            is_private=True,
+            created_at=user.created_at,
+            posts_count=0,
+            followers_count=0,
+            following_count=0,
+            is_following=False,
+            is_owner=False
+        )
 
     posts_count = db.query(models.Post).filter(models.Post.user_id == user.id).count()
     followers_count = len(user.followers)
     following_count = len(user.following)
 
-    return {
-        "id": user.id,
-        "username": user.username,
-        "nickname": user.nickname,
-        "bio": user.bio,
-        "avatar_path": user.avatar_path,
-        "is_private": user.is_private,
-        "created_at": user.created_at,
-        "posts_count": posts_count,
-        "followers_count": followers_count,
-        "following_count": following_count,
-        "is_following": is_following,
-        "is_owner": is_owner
-    }
+    return schemas.UserProfileOut(
+        id=user.id,
+        username=user.username,
+        nickname=user.nickname,
+        bio=user.bio,
+        avatar_path=user.avatar_path,
+        header_path=user.header_path,
+        is_private=user.is_private,
+        created_at=user.created_at,
+        posts_count=posts_count,
+        followers_count=followers_count,
+        following_count=following_count,
+        is_following=is_following,
+        is_owner=is_owner
+    )
