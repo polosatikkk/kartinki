@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database import get_db
 from app import models, schemas
-from app.routes.auth import get_current_user, verify_password, hash_password
+from app.routes.auth import get_current_user, get_current_user_optional, verify_password, hash_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -70,7 +70,7 @@ def remove_follower(
 @router.get("/{username}/followers", response_model=List[schemas.UserListItem])
 def get_followers(
         username: str,
-        current_user: Annotated[models.User | None, Depends(get_current_user)] = None,
+        current_user: Annotated[models.User | None, Depends(get_current_user_optional)] = None,
         db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -99,7 +99,7 @@ def get_followers(
 @router.get("/{username}/following", response_model=List[schemas.UserListItem])
 def get_following(
         username: str,
-        current_user: Annotated[models.User | None, Depends(get_current_user)] = None,
+        current_user: Annotated[models.User | None, Depends(get_current_user_optional)] = None,
         db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -129,7 +129,7 @@ def get_following(
 @router.get("/{username}", response_model=schemas.UserProfileOut)
 def get_user_profile(
         username: str,
-        current_user: Annotated[models.User | None, Depends(get_current_user)] = None,
+        current_user: Annotated[models.User | None, Depends(get_current_user_optional)] = None,
         db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -305,7 +305,7 @@ def delete_my_profile(
 @router.get("/search/", response_model=List[schemas.UserListItem])
 def search_users(
         q: str,
-        current_user: Optional[models.User] = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     users = db.query(models.User).filter(
