@@ -39,6 +39,7 @@ class User(Base):
         secondaryjoin=(followers.c.followed_id == id),
         backref='followers'
     )
+    bookmarks = relationship("Bookmark", back_populates="user", cascade="all, delete-orphan")
 
 
 class Post(Base):
@@ -85,7 +86,7 @@ class Bookmark(Base):
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User", backref="bookmarks")
+    user = relationship("User", back_populates="bookmarks")
     post = relationship("Post", backref="bookmarks")
 
 
