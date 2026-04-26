@@ -6,8 +6,8 @@ from app.database import Base
 followers = Table(
     'followers',
     Base.metadata,
-    Column('follower_id', Integer, ForeignKey('users.id'), primary_key=True),
-    Column('followed_id', Integer, ForeignKey('users.id'), primary_key=True),
+    Column('follower_id', Integer, ForeignKey('users.id', ondelete="CASCADE"), primary_key=True),
+    Column('followed_id', Integer, ForeignKey('users.id', ondelete="CASCADE"), primary_key=True),
     Column('created_at', DateTime(timezone=True), server_default=func.now())
 )
 
