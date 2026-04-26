@@ -12,12 +12,6 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Нить")
 
 app.add_middleware(
-    SessionMiddleware,
-    secret_key=SESSION_SECRET_KEY,
-    session_cookie="admin_session",
-    max_age=3600
-)
-app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
@@ -25,6 +19,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SESSION_SECRET_KEY,
+    session_cookie="admin_session",
+    max_age=3600
+)
 app.mount("/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 
 app.include_router(auth.router)
