@@ -9,6 +9,7 @@ from app import models, schemas
 from app.routes.auth import get_current_user, get_current_user_optional, verify_password, hash_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])
+
 AVATAR_DIR = "app/uploads/avatars"
 HEADER_DIR = "app/uploads/headers"
 os.makedirs(AVATAR_DIR, exist_ok=True)
@@ -39,8 +40,6 @@ def search_users(
     return result
 
 
-
-
 @router.patch("/me", response_model=schemas.UserOut)
 def update_my_profile(
         profile_data: schemas.UserUpdate,
@@ -56,6 +55,30 @@ def update_my_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.delete("/me")
+def delete_my_profile(
+        current_user: Annotated[models.User, Depends(get_current_user)],
+        db: Session = Depends(get_db)
+):
+    if current_user.avatar_path:
+        avatar_path = os.path.join(AVATAR_DIR, current_user.avatar_path)
+        if os.path.exists(avatar_path):
+            os.remove(avatar_path)
+    if current_user.header_path:
+        header_path = os.path.join(HEADER_DIR, current_user.header_path)
+        if os.path.exists(header_path):
+            os.remove(header_path)
+    posts = db.query(models.Post).filter(models.Post.user_id == current_user.id).all()
+    for post in posts:
+        if post.image_path:
+            file_path = os.path.join("app/uploads", post.image_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+    db.delete(current_user)
+    db.commit()
+    return {"message": "Профиль удален"}
 
 
 @router.post("/me/avatar")
@@ -80,7 +103,6 @@ async def upload_avatar(
         f.write(contents)
     current_user.avatar_path = filename
     db.commit()
-
     return {"avatar_url": f"/uploads/avatars/{filename}"}
 
 
@@ -92,7 +114,6 @@ async def upload_header(
 ):
     if not file.filename:
         raise HTTPException(400, "Файл не выбран")
-
     file_ext = file.filename.split(".")[-1].lower()
     if file_ext not in ["jpg", "jpeg", "png", "gif", "webp"]:
         raise HTTPException(400, "Неподдерживаемый формат")
@@ -100,17 +121,13 @@ async def upload_header(
         old_path = os.path.join(HEADER_DIR, current_user.header_path)
         if os.path.exists(old_path):
             os.remove(old_path)
-
     filename = f"{uuid.uuid4()}.{file_ext}"
     file_path = os.path.join(HEADER_DIR, filename)
-
     contents = await file.read()
     with open(file_path, "wb") as f:
         f.write(contents)
-
     current_user.header_path = filename
     db.commit()
-
     return {"header_url": f"/uploads/headers/{filename}"}
 
 
@@ -125,8 +142,8 @@ def delete_header(
             os.remove(old_path)
         current_user.header_path = None
         db.commit()
-
     return {"message": "Шапка удалена"}
+
 
 @router.post("/me/change-password")
 def change_password(
@@ -139,68 +156,6 @@ def change_password(
     current_user.hashed_password = hash_password(password_data.new_password)
     db.commit()
     return {"message": "Пароль успешно изменен"}
-
-
-@router.delete("/me")
-def delete_my_profile(
-        current_user: Annotated[models.User, Depends(get_current_user)],
-        db: Session = Depends(get_db)
-):
-
-    if current_user.avatar_path:
-        avatar_path = os.path.join(AVATAR_DIR, current_user.avatar_path)
-        if os.path.exists(avatar_path):
-            os.remove(avatar_path)
-    if current_user.header_path:
-        header_path = os.path.join(HEADER_DIR, current_user.header_path)
-        if os.path.exists(header_path):
-            os.remove(header_path)
-    posts = db.query(models.Post).filter(models.Post.user_id == current_user.id).all()
-    for post in posts:
-        if post.image_path:
-            file_path = os.path.join("app/uploads", post.image_path)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-    db.delete(current_user)
-    db.commit()
-
-    return {"message": "Профиль удален"}
-
-
-@router.post("/{username}/follow")
-def follow_user(
-        username: str,
-        current_user: Annotated[models.User, Depends(get_current_user)],
-        db: Session = Depends(get_db)
-):
-    if current_user.username == username:
-        raise HTTPException(400)
-    user_to_follow = db.query(models.User).filter(models.User.username == username).first()
-    if not user_to_follow:
-        raise HTTPException(404, "Пользователь не найден")
-    if user_to_follow in current_user.following:
-        raise HTTPException(400, "Вы уже подписаны")
-
-    current_user.following.append(user_to_follow)
-    db.commit()
-    return {"message": f"Вы подписались на {username}"}
-
-
-@router.delete("/{username}/follow")
-def unfollow_user(
-        username: str,
-        current_user: Annotated[models.User, Depends(get_current_user)],
-        db: Session = Depends(get_db)
-):
-    user_to_unfollow = db.query(models.User).filter(models.User.username == username).first()
-    if not user_to_unfollow:
-        raise HTTPException(404, "Пользователь не найден")
-    if user_to_unfollow not in current_user.following:
-        raise HTTPException(400, "Вы не подписаны на этого пользователя")
-    current_user.following.remove(user_to_unfollow)
-    db.commit()
-
-    return {"message": f"Вы отписались от {username}"}
 
 
 @router.delete("/followers/{username}")
@@ -217,6 +172,7 @@ def remove_follower(
     current_user.followers.remove(follower)
     db.commit()
     return {"message": f"Подписчик удален"}
+
 
 @router.get("/{username}/followers", response_model=List[schemas.UserListItem])
 def get_followers(
@@ -273,8 +229,41 @@ def get_following(
             "avatar_path": followed.avatar_path,
             "is_following": is_following
         })
-
     return following_list
+
+
+@router.post("/{username}/follow")
+def follow_user(
+        username: str,
+        current_user: Annotated[models.User, Depends(get_current_user)],
+        db: Session = Depends(get_db)
+):
+    if current_user.username == username:
+        raise HTTPException(400)
+    user_to_follow = db.query(models.User).filter(models.User.username == username).first()
+    if not user_to_follow:
+        raise HTTPException(404, "Пользователь не найден")
+    if user_to_follow in current_user.following:
+        raise HTTPException(400, "Вы уже подписаны")
+    current_user.following.append(user_to_follow)
+    db.commit()
+    return {"message": f"Вы подписались на {username}"}
+
+
+@router.delete("/{username}/follow")
+def unfollow_user(
+        username: str,
+        current_user: Annotated[models.User, Depends(get_current_user)],
+        db: Session = Depends(get_db)
+):
+    user_to_unfollow = db.query(models.User).filter(models.User.username == username).first()
+    if not user_to_unfollow:
+        raise HTTPException(404, "Пользователь не найден")
+    if user_to_unfollow not in current_user.following:
+        raise HTTPException(400, "Вы не подписаны на этого пользователя")
+    current_user.following.remove(user_to_unfollow)
+    db.commit()
+    return {"message": f"Вы отписались от {username}"}
 
 
 @router.get("/{username}", response_model=schemas.UserProfileOut)
