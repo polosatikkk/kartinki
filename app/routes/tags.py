@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from app.database import get_db
 from app import models, schemas
-from app.routes.auth import get_current_user
+from app.routes.auth import get_current_user, get_current_user_optional
 
 router = APIRouter(prefix="/api/tags", tags=["tags"])
 
@@ -54,18 +54,33 @@ def get_posts_by_tag(
         tag_name: str,
         skip: int = 0,
         limit: int = 20,
-        current_user: Optional[models.User] = Depends(get_current_user),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
     tag = db.query(models.Tag).filter(models.Tag.name == tag_name.lower()).first()
     if not tag:
         return []
 
-    posts = db.query(models.Post).join(
+    query = db.query(models.Post).join(
         models.post_tags, models.post_tags.c.post_id == models.Post.id
+    ).join(
+        models.User, models.User.id == models.Post.user_id
     ).filter(
         models.post_tags.c.tag_id == tag.id
-    ).order_by(models.Post.created_at.desc()).offset(skip).limit(limit).all()
+    )
+
+    if current_user:
+        following_ids = [u.id for u in current_user.following]
+        query = query.filter(
+            (models.User.is_private == False) |
+            (models.User.id.in_(following_ids)) |
+            (models.User.id == current_user.id)
+        )
+    else:
+        query = query.filter(models.User.is_private == False)
+
+    posts = query.order_by(models.Post.created_at.desc()).offset(skip).limit(limit).all()
+
     from app.routes.posts import _enrich_post
     current_user_id = current_user.id if current_user else None
     return [_enrich_post(p, current_user_id, db) for p in posts]

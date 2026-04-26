@@ -137,17 +137,29 @@ def get_popular_posts(
         current_user: Optional[models.User] = Depends(get_current_user_optional),
         db: Session = Depends(get_db)
 ):
+    likes_subquery = db.query(
+        models.Like.post_id,
+        func.count(models.Like.user_id).label('likes_count')
+    ).group_by(models.Like.post_id).subquery()
+    query = db.query(models.Post).join(
+        models.User, models.User.id == models.Post.user_id
+    ).outerjoin(
+        likes_subquery, likes_subquery.c.post_id == models.Post.id
+    )
     if current_user:
         following_ids = [u.id for u in current_user.following]
-        posts = db.query(models.Post).join(models.User).filter(
+        query = query.filter(
             (models.User.is_private == False) |
             (models.User.id.in_(following_ids)) |
             (models.User.id == current_user.id)
-        ).order_by(func.random()).offset(skip).limit(limit).all()
+        )
     else:
-        posts = db.query(models.Post).join(models.User).filter(
-            models.User.is_private == False
-        ).order_by(func.random()).offset(skip).limit(limit).all()
+        query = query.filter(models.User.is_private == False)
+
+    posts = query.order_by(
+        func.coalesce(likes_subquery.c.likes_count, 0).desc(),
+        models.Post.created_at.desc()
+    ).offset(skip).limit(limit).all()
 
     current_user_id = current_user.id if current_user else None
     return [_enrich_post(p, current_user_id, db) for p in posts]
