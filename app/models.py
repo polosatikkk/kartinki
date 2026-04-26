@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Table, UniqueConstraint
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Table
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -11,14 +11,12 @@ followers = Table(
     Column('created_at', DateTime(timezone=True), server_default=func.now())
 )
 
-
 post_tags = Table(
     'post_tags',
     Base.metadata,
     Column('post_id', Integer, ForeignKey('posts.id', ondelete="CASCADE"), primary_key=True),
     Column('tag_id', Integer, ForeignKey('tags.id', ondelete="CASCADE"), primary_key=True)
 )
-
 
 class User(Base):
     __tablename__ = "users"
@@ -43,14 +41,13 @@ class User(Base):
     )
 
 
-
 class Post(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, nullable=True)
     image_path = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     author = relationship("User", back_populates="posts")
     tags = relationship("Tag", secondary=post_tags, back_populates="posts")
@@ -81,6 +78,7 @@ class Comment(Base):
     post = relationship("Post", backref="comments")
     parent = relationship("Comment", remote_side=[id], backref="replies")
 
+
 class Bookmark(Base):
     __tablename__ = "bookmarks"
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
@@ -98,5 +96,3 @@ class Tag(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     posts = relationship("Post", secondary="post_tags", back_populates="tags")
-
-
