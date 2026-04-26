@@ -51,8 +51,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session 
     if user is None:
         raise credentials_exception
     return user
-def get_current_user_optional(token: Annotated[str | None, Depends(oauth2_scheme_optional)] = None,
-                              db: Session = Depends(get_db)):
+def get_current_user_optional(token: Annotated[str | None, Depends(oauth2_scheme_optional)] = None, db: Session = Depends(get_db)):
     if not token:
         return None
     try:
@@ -67,23 +66,19 @@ def get_current_user_optional(token: Annotated[str | None, Depends(oauth2_scheme
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user_data: schemas.UserReg, db: Session = Depends(get_db)):
-
     existing = db.query(models.User).filter(
         models.User.username == user_data.username
     ).first()
-
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Имя пользователя занято"
         )
-
     db_user = models.User(
         username=user_data.username,
         nickname=user_data.nickname if user_data.nickname else user_data.username,
         hashed_password=hash_password(user_data.password)
     )
-
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

@@ -1,4 +1,3 @@
-# app/admin.py
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
@@ -15,13 +14,11 @@ class AdminAuth(AuthenticationBackend):
             request.session.update({"admin_authenticated": True})
             return True
         return False
-
     async def logout(self, request: Request) -> bool:
         request.session.clear()
         return True
     async def authenticate(self, request: Request) -> bool:
         return request.session.get("admin_authenticated", False)
-
 
 class UserAdmin(ModelView, model=User):
     name = "Пользователь"
@@ -36,7 +33,6 @@ class UserAdmin(ModelView, model=User):
         User.avatar_path,
         User.header_path
     ]
-
     column_searchable_list = [User.username, User.nickname]
     column_sortable_list = [User.id, User.created_at]
     can_create = False
@@ -53,8 +49,6 @@ class UserAdmin(ModelView, model=User):
         User.avatar_path: "Аватар",
         User.header_path: "Шапка"
     }
-
-
 class PostAdmin(ModelView, model=Post):
     name = "Пост"
     name_plural = "Посты"
@@ -65,7 +59,6 @@ class PostAdmin(ModelView, model=Post):
         Post.created_at,
         Post.image_path
     ]
-
     column_searchable_list = [Post.description]
     column_sortable_list = [Post.id, Post.created_at]
     can_delete = True
@@ -76,7 +69,6 @@ class PostAdmin(ModelView, model=Post):
         Post.created_at: "Создан",
         Post.image_path: "Картинка"
     }
-
 class TagAdmin(ModelView, model=Tag):
     name = "Тег"
     name_plural = "Теги"
@@ -93,7 +85,6 @@ class CommentAdmin(ModelView, model=Comment):
         Comment.post_id,
         Comment.created_at
     ]
-
     column_searchable_list = [Comment.text]
     can_delete = True
     column_labels = {
@@ -103,6 +94,8 @@ class CommentAdmin(ModelView, model=Comment):
         Comment.post_id: "ID поста",
         Comment.created_at: "Создан"
     }
+
+
 
 
 def setup_admin(app):

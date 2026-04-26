@@ -2,13 +2,11 @@ from typing import List, Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-
 from app.database import get_db
 from app import models, schemas
 from app.routes.auth import get_current_user
 
 router = APIRouter(prefix="/api/comments", tags=["comments"])
-
 
 def _enrich_comment(comment: models.Comment, current_user_id: Optional[int], db: Session):
     replies_count = db.query(func.count(models.Comment.id)).filter(

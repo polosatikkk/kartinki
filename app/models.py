@@ -34,7 +34,6 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
-
     following = relationship(
         'User',
         secondary=followers,

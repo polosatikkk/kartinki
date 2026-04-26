@@ -9,7 +9,6 @@ from app import models, schemas
 from app.routes.auth import get_current_user, get_current_user_optional, verify_password, hash_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])
-
 AVATAR_DIR = "app/uploads/avatars"
 HEADER_DIR = "app/uploads/headers"
 os.makedirs(AVATAR_DIR, exist_ok=True)
@@ -54,7 +53,6 @@ def update_my_profile(
         current_user.bio = profile_data.bio
     if profile_data.is_private is not None:
         current_user.is_private = profile_data.is_private
-
     db.commit()
     db.refresh(current_user)
     return current_user
@@ -75,7 +73,6 @@ async def upload_avatar(
         old_path = os.path.join(AVATAR_DIR, current_user.avatar_path)
         if os.path.exists(old_path):
             os.remove(old_path)
-
     filename = f"{uuid.uuid4()}.{file_ext}"
     file_path = os.path.join(AVATAR_DIR, filename)
     contents = await file.read()

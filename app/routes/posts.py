@@ -180,7 +180,6 @@ def get_following_feed(
     return [_enrich_post(p, current_user.id, db) for p in posts]
 
 
-
 @router.get("/user/{username}", response_model=List[schemas.PostOut])
 def get_user_posts(
         username: str,
@@ -195,13 +194,16 @@ def get_user_posts(
 
     is_owner = current_user and current_user.id == user.id
     is_following = current_user and (user in current_user.following)
+
     if user.is_private and not is_owner and not is_following:
         return []
+
     posts = db.query(models.Post).filter(
         models.Post.user_id == user.id
     ).order_by(models.Post.created_at.desc()).offset(skip).limit(limit).all()
 
-    return posts
+    current_user_id = current_user.id if current_user else None
+    return [_enrich_post(p, current_user_id, db) for p in posts]
 
 
 @router.get("/{post_id}", response_model=schemas.PostOut)
