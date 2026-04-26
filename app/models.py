@@ -18,6 +18,7 @@ post_tags = Table(
     Column('tag_id', Integer, ForeignKey('tags.id', ondelete="CASCADE"), primary_key=True)
 )
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -40,6 +41,8 @@ class User(Base):
         backref='followers'
     )
     bookmarks = relationship("Bookmark", back_populates="user", cascade="all, delete-orphan")
+    likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
 
 
 class Post(Base):
@@ -52,6 +55,9 @@ class Post(Base):
 
     author = relationship("User", back_populates="posts")
     tags = relationship("Tag", secondary=post_tags, back_populates="posts")
+    likes = relationship("Like", back_populates="post", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
+    bookmarks = relationship("Bookmark", back_populates="post", cascade="all, delete-orphan")
 
 
 class Like(Base):
@@ -60,8 +66,8 @@ class Like(Base):
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User", backref="likes")
-    post = relationship("Post", backref="likes")
+    user = relationship("User", back_populates="likes")
+    post = relationship("Post", back_populates="likes")
 
 
 class Comment(Base):
@@ -75,8 +81,8 @@ class Comment(Base):
     post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False)
     parent_id = Column(Integer, ForeignKey("comments.id", ondelete="CASCADE"), nullable=True)
 
-    user = relationship("User", backref="comments")
-    post = relationship("Post", backref="comments")
+    user = relationship("User", back_populates="comments")
+    post = relationship("Post", back_populates="comments")
     parent = relationship("Comment", remote_side=[id], backref="replies")
 
 
@@ -87,7 +93,7 @@ class Bookmark(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="bookmarks")
-    post = relationship("Post", backref="bookmarks")
+    post = relationship("Post", back_populates="bookmarks")
 
 
 class Tag(Base):
